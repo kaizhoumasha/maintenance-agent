@@ -1,7 +1,8 @@
 import pytest
-
 from pydantic import ValidationError
+
 from app.models import AskRequest, AskResponse
+
 
 def test_ask_request_ok() -> None:
     req = AskRequest(question="泵异响怎么办")

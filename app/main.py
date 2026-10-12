@@ -2,8 +2,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.exceptions.errors import HTTP_STATUS, AppError, ErrorCode, ErrorResponse
-from app.logger import setup_logging
+from app.logger import logger, setup_logging
 from app.middlewares.trace_id_middleware import get_trace_id, trace_id_middleware
+from app.models import AskRequest, AskResponse
 
 app = FastAPI(title="maintenance-agent")
 app.middleware("http")(trace_id_middleware)
@@ -40,5 +41,6 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 @app.post("/ask")
-async def ask(request: Request) -> dict[str, str]:
+async def ask(req: AskRequest) -> AskResponse:
+    logger.info("receive request: %s", req.json())
     raise AppError(code=ErrorCode.UPSTREAM_ERROR, message="上游异常",)
