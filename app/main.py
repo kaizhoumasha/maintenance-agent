@@ -42,5 +42,5 @@ def health() -> dict[str, str]:
 
 @app.post("/ask")
 async def ask(req: AskRequest) -> AskResponse:
-    logger.info("receive request: %s", req.json())
+    logger.info("receive request: %s", req.model_dump_json())
     raise AppError(code=ErrorCode.UPSTREAM_ERROR, message="上游异常",)
