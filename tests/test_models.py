@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.models import AskRequest, AskResponse
+from app.schemas import AskRequest, AskResponse
 
 
 def test_ask_request_ok() -> None:
