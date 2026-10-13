@@ -11,7 +11,7 @@ def test_ask_request_ok() -> None:
 
 def test_ask_request_missing_question() -> None:
     with pytest.raises(ValidationError) as exc_info:
-        AskRequest()
+        AskRequest()  # pyright: ignore[reportCallIssue] -- 故意缺 question,验证校验报错。
     assert exc_info.value.errors()[0]["loc"] == ("question",)
 
 def test_ask_response_defaults() -> None:

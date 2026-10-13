@@ -1,7 +1,8 @@
+from typing import Any
 from unittest.mock import patch
 
+import httpx2
 import pytest
-from fastapi import Response
 from fastapi.testclient import TestClient
 
 from app.core import HTTP_STATUS, AppError, ErrorCode
@@ -11,9 +12,9 @@ from app.main import app
 client = TestClient(app, raise_server_exceptions=False)
 
 
-def _assert_error(r: Response, status: int, code: ErrorCode) -> dict:
+def _assert_error(r: httpx2.Response, status: int, code: ErrorCode) -> dict[str, Any]:
     assert r.status_code == status
-    body = r.json()
+    body: dict[str, Any] = r.json()
     assert set(body) == {"trace_id", "code", "message", "detail"}
     assert body["code"] == code
     assert body["trace_id"] != "-"
@@ -40,7 +41,7 @@ def test_ask_unhandled_error_http() -> None:
 
 
 @pytest.mark.parametrize("payload", [{}, {"question": ""}, {"question": "   "}, {"question": "x" * 2001}])
-def test_ask_invalid_request_http(payload: dict) -> None:
+def test_ask_invalid_request_http(payload: dict[str, Any]) -> None:
     r = client.post("/ask", json=payload)
     body = _assert_error(r, 400, ErrorCode.INVALID_REQUEST)
     assert "question" in body["detail"]

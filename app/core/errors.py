@@ -80,7 +80,7 @@ class AppError(Exception):
     message: str
     detail: str | None
 
-    def __init__(self, code: ErrorCode, message: str, detail: str | None = None):
+    def __init__(self, code: ErrorCode, message: str, detail: str | None = None) -> None:
         """
         初始化AppError实例
 

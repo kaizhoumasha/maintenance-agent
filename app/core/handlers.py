@@ -114,7 +114,16 @@ def register_exception_handlers(app: FastAPI) -> None:
     Returns:
         None
     """
-    app.add_exception_handler(AppError, app_error_handler)  # type: ignore[arg-type]
-    app.add_exception_handler(RequestValidationError, validation_error_handler)  # type: ignore[arg-type]
-    app.add_exception_handler(StarletteHTTPException, http_error_handler)  # type: ignore[arg-type]
+    app.add_exception_handler(
+        AppError,
+        app_error_handler,  # type: ignore[arg-type] -- handler 参数类型比 Exception 窄
+    )
+    app.add_exception_handler(
+        RequestValidationError,
+        validation_error_handler,  # type: ignore[arg-type] -- handler 参数类型比 Exception 窄
+    )
+    app.add_exception_handler(
+        StarletteHTTPException,
+        http_error_handler,  # type: ignore[arg-type] -- handler 参数类型比 Exception 窄
+    )
     app.add_exception_handler(Exception, unhandled_error_handler)

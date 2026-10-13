@@ -47,7 +47,7 @@ def test_ask_service_upstream() -> None:
     ],
 )
 def test_ask_service_maps_httpx_errors(exc: Exception, code: ErrorCode) -> None:
-    def boom(question: str) -> str:
+    async def boom(question: str) -> str:
         raise exc
 
     with pytest.raises(AppError) as exc_info:
