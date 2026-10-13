@@ -19,5 +19,4 @@ def test_trace_id_unique_per_request() -> None:
 
 
 def test_ask_route_is_sync() -> None:
-    # 同步的 ask_service 必须跑在线程池里;改成 async def 会阻塞事件循环
-    assert not inspect.iscoroutinefunction(ask)
+    assert inspect.iscoroutinefunction(ask)

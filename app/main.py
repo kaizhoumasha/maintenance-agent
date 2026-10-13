@@ -39,6 +39,6 @@ def health() -> dict[str, str]:
 
 # 同步 def:ask_service 是阻塞调用,交给线程池,避免卡住事件循环
 @app.post("/ask", response_model=AskResponse)
-def ask(req: AskRequest) -> AskResponse:
+async def ask(req: AskRequest) -> AskResponse:
     logger.info("receive request: question_len=%d device_id=%s", len(req.question), req.device_id)
-    return ask_service(req)
+    return await ask_service(req)

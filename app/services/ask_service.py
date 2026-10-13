@@ -7,9 +7,9 @@ from app.core import AppError, ErrorCode
 from app.schemas import AskRequest, AskResponse
 
 
-def ask_service(req: AskRequest, call_model_fn: Callable[[str], str] = call_model) -> AskResponse:
+async def ask_service(req: AskRequest, call_model_fn: Callable[[str], str] = call_model) -> AskResponse:
     try:
-        answer = call_model_fn(req.question)
+        answer = await call_model_fn(req.question)
     except (TimeoutError, httpx2.TimeoutException) as exc:
         raise AppError(code=ErrorCode.MODEL_TIMEOUT, message="模型超时", detail=str(exc)) from exc
     except httpx2.HTTPError as exc:
