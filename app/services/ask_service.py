@@ -1,4 +1,5 @@
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine
+from typing import Any
 
 import httpx2
 
@@ -7,7 +8,7 @@ from app.core import AppError, ErrorCode
 from app.schemas import AskRequest, AskResponse
 
 
-async def ask_service(req: AskRequest, call_model_fn: Callable[[str], str] = call_model) -> AskResponse:
+async def ask_service(req: AskRequest, call_model_fn: Callable[[str], Coroutine[Any, Any, str]] = call_model) -> AskResponse:
     try:
         answer = await call_model_fn(req.question)
     except (TimeoutError, httpx2.TimeoutException) as exc:
