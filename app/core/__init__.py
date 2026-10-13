@@ -1,4 +1,4 @@
-from .config import Settings, settings
+from .config import Settings, get_settings
 from .errors import HTTP_STATUS, AppError, ErrorCode, ErrorResponse
 from .handlers import register_exception_handlers
 from .logger import logger, setup_logging
@@ -10,11 +10,11 @@ __all__ = [
     "ErrorCode",
     "ErrorResponse",
     "Settings",
+    "get_settings",
     "get_trace_id",
     "logger",
     "register_exception_handlers",
     "set_trace_id",
-    "settings",
     "setup_logging",
     "trace_id_var"
 ]

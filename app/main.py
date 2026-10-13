@@ -1,6 +1,15 @@
-from fastapi import FastAPI
+import sys
 
-from app.core import logger, register_exception_handlers, settings, setup_logging
+from fastapi import FastAPI
+from pydantic import ValidationError
+
+from app.core import (
+    Settings,
+    get_settings,
+    logger,
+    register_exception_handlers,
+    setup_logging,
+)
 from app.middlewares import trace_id_middleware
 from app.schemas import AskRequest, AskResponse
 from app.services import ask_service
@@ -10,7 +19,17 @@ app.middleware("http")(trace_id_middleware)
 register_exception_handlers(app)
 
 setup_logging()
-settings()
+
+def _load_settings() -> Settings:
+    try:
+        return get_settings()
+    except ValidationError as e:
+        missing = sorted({str(err["loc"][0]) for err in e.errors() if err["type"] == "missing"})
+        print(f"启动失败,缺少必填配置: {', '.join(missing)}", file=sys.stderr)
+        raise SystemExit(1)
+
+
+settings = _load_settings()
 
 
 @app.get("/health")
