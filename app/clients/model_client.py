@@ -1,25 +1,23 @@
-import asyncio
+import litellm
 
 from app.core import get_settings, logger
 
 MAX_RETRIES = 2
-_FAKE_LATENCY_S = 0.05  # 模拟模型推理延迟;Day 8 接真模型时删掉
 
 
 async def call_model(question: str) -> str:
-    timeout = get_settings().model_timeout_s
-    last_exc: Exception | None = None
+    settings = get_settings()
+    last_exc: litellm.Timeout | None = None
     for attempt in range(1 + MAX_RETRIES):
         try:
-            return await asyncio.wait_for(_fake_infer(question), timeout=timeout)
-        except TimeoutError as e:
+            resp = await litellm.acompletion(
+                model=settings.model_name,
+                api_base=settings.model_api_base,
+                messages=[{"role": "user", "content": question}],
+                timeout=settings.model_timeout_s,
+            )
+            return resp.choices[0].message.content or ""
+        except litellm.Timeout as e:
             last_exc = e
-            if attempt == MAX_RETRIES:
-                break
-            logger.warning("模型调用超时,第 %d 次重试 question_len=%d", attempt + 1, len(question))
+            logger.warning("模型调用超时,第 %d 次尝试 question_len=%d", attempt + 1, len(question))
     raise TimeoutError(f"模型调用超时,已重试 {MAX_RETRIES} 次") from last_exc
-
-
-async def _fake_infer(question: str) -> str:
-    await asyncio.sleep(_FAKE_LATENCY_S)
-    return "this is a mock model response"

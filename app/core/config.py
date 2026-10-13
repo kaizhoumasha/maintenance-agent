@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     model_name: str
+    model_api_base: str | None = None  # 本地 ollama 填 http://localhost:11434;为空时 litellm 用各 provider 默认地址
     model_timeout_s: float = 30.0
     log_level: str = "INFO"
 
