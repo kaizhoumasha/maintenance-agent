@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+from fastapi import Response
 from fastapi.testclient import TestClient
 
 from app.core import AppError, ErrorCode
@@ -10,7 +11,7 @@ from app.main import app
 client = TestClient(app, raise_server_exceptions=False)
 
 
-def _assert_error(r, status: int, code: ErrorCode) -> dict:
+def _assert_error(r: Response, status: int, code: ErrorCode) -> dict:
     assert r.status_code == status
     body = r.json()
     assert set(body) == {"trace_id", "code", "message", "detail"}
@@ -47,4 +48,22 @@ def test_ask_invalid_request_http(payload: dict) -> None:
 
 def test_unknown_route_http() -> None:
     r = client.get("/nope")
-    _assert_error(r, 404, ErrorCode.INVALID_REQUEST)
+    _assert_error(r, 404, ErrorCode.NOT_FOUND)
+
+
+def test_method_not_allowed_http() -> None:
+    r = client.get("/ask")
+    _assert_error(r, 405, ErrorCode.METHOD_NOT_ALLOWED)
+
+
+@pytest.mark.parametrize(
+    ("code", "has_stack"),
+    [(ErrorCode.INVALID_REQUEST, False), (ErrorCode.UPSTREAM_ERROR, True)],
+)
+def test_app_error_stack_only_for_5xx(
+    code: ErrorCode, has_stack: bool, caplog: pytest.LogCaptureFixture
+) -> None:
+    with patch("app.main.ask_service", side_effect=AppError(code=code, message="m")):
+        client.post("/ask", json={"question": "x"})
+    record = next(r for r in caplog.records if r.levelname == "WARNING")
+    assert bool(record.exc_info) is has_stack
