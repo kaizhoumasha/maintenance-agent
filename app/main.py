@@ -1,10 +1,17 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.exceptions.errors import HTTP_STATUS, AppError, ErrorCode, ErrorResponse
-from app.logger import logger, setup_logging
-from app.middlewares.trace_id_middleware import get_trace_id, trace_id_middleware
-from app.models import AskRequest, AskResponse
+from app.core import (
+    HTTP_STATUS,
+    AppError,
+    ErrorCode,
+    ErrorResponse,
+    get_trace_id,
+    logger,
+    setup_logging,
+)
+from app.middlewares import trace_id_middleware
+from app.schemas import AskRequest, AskResponse
 
 app = FastAPI(title="maintenance-agent")
 app.middleware("http")(trace_id_middleware)

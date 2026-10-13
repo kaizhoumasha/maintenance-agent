@@ -11,22 +11,10 @@ default="-" 是安全网。 万一有请求没走 middleware（比如测试里�
 """
 import uuid
 from collections.abc import Awaitable, Callable
-from contextvars import ContextVar
 
 from fastapi import Request, Response
 
-# 使用 ContextVar 存储 trace_id,支持异步上下文隔离
-trace_id_var: ContextVar[str] = ContextVar("trace_id", default="-")
-
-
-def get_trace_id() -> str:
-    """
-    获取当前请求上下文的 trace_id
-    
-    Returns:
-        str: 当前请求的 trace_id,如果未设置则返回 "-"
-    """
-    return trace_id_var.get()
+from app.core.request_context import set_trace_id, trace_id_var
 
 
 async def trace_id_middleware(
@@ -45,7 +33,7 @@ async def trace_id_middleware(
     # 生成唯一的 trace_id (使用 UUID4 的十六进制字符串)
     trace_id = uuid.uuid4().hex
     # 将 trace_id 设置到当前上下文中
-    token = trace_id_var.set(trace_id)
+    token = set_trace_id(trace_id)
     try:
         # 调用下一个中间件或路由处理函数
         response = await call_next(request)

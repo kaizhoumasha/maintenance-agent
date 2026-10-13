@@ -1,6 +1,6 @@
 import logging
 
-from app.middlewares.trace_id_middleware import get_trace_id
+from app.core.request_context import get_trace_id
 
 
 class TraceIdFilter(logging.Filter):
@@ -9,7 +9,6 @@ class TraceIdFilter(logging.Filter):
         return True
 
 _done = False
-
 def setup_logging() -> None:
     global _done
     if _done:
@@ -17,7 +16,7 @@ def setup_logging() -> None:
 
     handler = logging.StreamHandler()
     handler.setFormatter(
-        logging.Formatter("%(asctime)s [%(trace_id)s] %(levelname)s %(name)s: %(message)s")
+        logging.Formatter("[%(trace_id)s] [%(asctime)s] %(levelname)s %(name)s: %(message)s")
     )
     handler.addFilter(TraceIdFilter())
     root = logging.getLogger()
