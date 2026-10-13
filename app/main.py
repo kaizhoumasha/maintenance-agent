@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.core import logger, register_exception_handlers, setup_logging
+from app.core import logger, register_exception_handlers, settings, setup_logging
 from app.middlewares import trace_id_middleware
 from app.schemas import AskRequest, AskResponse
 from app.services import ask_service
@@ -10,6 +10,7 @@ app.middleware("http")(trace_id_middleware)
 register_exception_handlers(app)
 
 setup_logging()
+settings()
 
 
 @app.get("/health")

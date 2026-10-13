@@ -4,7 +4,7 @@ import pytest
 from fastapi import Response
 from fastapi.testclient import TestClient
 
-from app.core import AppError, ErrorCode
+from app.core import HTTP_STATUS, AppError, ErrorCode
 from app.main import app
 
 # raise_server_exceptions=False: 让未处理异常走兜底 handler,而不是在测试里直接抛出
@@ -67,3 +67,8 @@ def test_app_error_stack_only_for_5xx(
         client.post("/ask", json={"question": "x"})
     record = next(r for r in caplog.records if r.levelname == "WARNING")
     assert bool(record.exc_info) is has_stack
+
+
+def test_http_status_unique() -> None:
+    # handlers.py 按状态码反查错误码,状态码重复会让反查结果不确定
+    assert len(set(HTTP_STATUS.values())) == len(HTTP_STATUS)

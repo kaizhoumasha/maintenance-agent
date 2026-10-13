@@ -7,11 +7,9 @@ from .errors import HTTP_STATUS, AppError, ErrorCode, ErrorResponse
 from .logger import logger
 from .request_context import get_trace_id
 
-# 未列出的 HTTP 状态码统一按 INVALID_REQUEST 处理
-_HTTP_ERROR_CODE = {
-    404: ErrorCode.NOT_FOUND,
-    405: ErrorCode.METHOD_NOT_ALLOWED,
-}
+# 由 HTTP_STATUS 反查,新增错误码只需在 errors.py 定义一次;未列出的状态码统一按 INVALID_REQUEST 处理
+# shortcut: 反查要求状态码唯一(test_http_status_unique 保证),两个错误码共用一个状态码时改为显式映射
+_HTTP_ERROR_CODE = {status: code for code, status in HTTP_STATUS.items()}
 
 
 def _error_response(

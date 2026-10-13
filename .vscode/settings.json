@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "caplog",
+        "delenv",
         "pytest",
         "uvicorn"
     ]
