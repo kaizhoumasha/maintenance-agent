@@ -11,8 +11,12 @@ dependencies = [
     "fastapi>=0.143.0",
     "httpx2>=2.13.1",
     "pydantic>=2.14.0",
-    "pytest>=9.1.1",
     "uvicorn>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
 ]
 
 [build-system]

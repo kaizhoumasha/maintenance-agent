@@ -17,3 +17,9 @@ def test_ask_request_missing_question() -> None:
 def test_ask_response_defaults() -> None:
     resp = AskResponse(answer="检查皮带张紧度")
     assert resp.confidence == 0.0
+
+
+@pytest.mark.parametrize("q", ["", "   ", "x" * 2001])
+def test_ask_request_rejects_bad_question(q: str) -> None:
+    with pytest.raises(ValidationError):
+        AskRequest(question=q)

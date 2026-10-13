@@ -1,3 +1,4 @@
+import httpx2
 import pytest
 
 from app.core import AppError, ErrorCode
@@ -34,3 +35,20 @@ def test_ask_service_upstream() -> None:
         ask_service(req, _raise_upstream)
     assert exc_info.value.code == ErrorCode.UPSTREAM_ERROR
     assert exc_info.value.message == "上游异常"
+
+
+@pytest.mark.parametrize(
+    ("exc", "code"),
+    [
+        (httpx2.ReadTimeout("t"), ErrorCode.MODEL_TIMEOUT),
+        (httpx2.ConnectError("c"), ErrorCode.UPSTREAM_ERROR),
+    ],
+)
+def test_ask_service_maps_httpx_errors(exc: Exception, code: ErrorCode) -> None:
+    def boom(question: str) -> str:
+        raise exc
+
+    with pytest.raises(AppError) as exc_info:
+        ask_service(AskRequest(question="测试问题"), boom)
+    assert exc_info.value.code == code
+    assert exc_info.value.__cause__ is exc

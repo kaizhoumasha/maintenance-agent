@@ -24,12 +24,13 @@ class ErrorResponse(BaseModel):
     message: str
     detail: str | None
 
-class AppError(Exception):
 
+class AppError(Exception):
     code: ErrorCode
     message: str
     detail: str | None
     def __init__(self, code: ErrorCode, message: str, detail: str | None = None):
+        super().__init__(message)
         self.code = code
         self.message = message
         self.detail = detail
