@@ -12,6 +12,7 @@ from app.core import (
 )
 from app.middlewares import trace_id_middleware
 from app.schemas import AskRequest, AskResponse
+from app.services import ask_service
 
 app = FastAPI(title="maintenance-agent")
 app.middleware("http")(trace_id_middleware)
@@ -47,7 +48,7 @@ setup_logging()
 def health() -> dict[str, str]:
     return {"status": "ok"}
 
-@app.post("/ask")
+@app.post("/ask", response_model=AskResponse)
 async def ask(req: AskRequest) -> AskResponse:
     logger.info("receive request: %s", req.model_dump_json())
-    raise AppError(code=ErrorCode.UPSTREAM_ERROR, message="上游异常",)
+    return ask_service(req)
