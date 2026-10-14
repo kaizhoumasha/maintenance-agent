@@ -12,7 +12,7 @@ client = TestClient(app)
 
 def test_logs_carry_trace_id(caplog: pytest.LogCaptureFixture) -> None:
     fake = AskResponse(answer="ok", confidence=0.9)
-    with caplog.at_level(logging.INFO) and patch("app.main.ask_service", new=AsyncMock(return_value=fake)):
+    with caplog.at_level(logging.INFO), patch("app.main.ask_service", new=AsyncMock(return_value=fake)):
         r = client.post("/ask", json={"question": "泵异响怎么办"})
     trace_id = r.headers["X-Trace-Id"]
     app_logs = [rec for rec in caplog.records if rec.name == "maintenance-agent"]
