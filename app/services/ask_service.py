@@ -2,6 +2,7 @@ from collections.abc import Callable, Coroutine
 from typing import Any
 
 import httpx2
+import openai
 
 from app.clients.model_client import call_model
 from app.core import AppError, ErrorCode
@@ -13,11 +14,10 @@ async def ask_service(req: AskRequest, call_model_fn: Callable[[str], Coroutine[
         answer = await call_model_fn(req.question)
     except (TimeoutError, httpx2.TimeoutException) as exc:
         raise AppError(code=ErrorCode.MODEL_TIMEOUT, message="模型超时", detail=str(exc)) from exc
-    except httpx2.HTTPError as exc:
+    except (httpx2.HTTPError, openai.APIError) as exc:
         # detail 只给异常类型名,避免把上游地址等内部信息返回给客户端
         raise AppError(
             code=ErrorCode.UPSTREAM_ERROR, message="上游异常", detail=type(exc).__name__
         ) from exc
     
     return AskResponse(answer=answer)
-

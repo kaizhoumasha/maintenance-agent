@@ -4,6 +4,7 @@
         "caplog",
         "delenv",
         "litellm",
+        "OLLAMA",
         "pytest",
         "uvicorn"
     ]

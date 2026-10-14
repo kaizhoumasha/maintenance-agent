@@ -1,18 +1,22 @@
 import inspect
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 
 from app.core import get_settings
 from app.main import _load_settings, app, ask
+from app.schemas import AskResponse
 
 client = TestClient(app)
 
 
 def test_ask_ok_http() -> None:
-    r = client.post("/ask", json={"question": "泵异响怎么办"})
+    fake = AskResponse(answer="ok", confidence=0.9)
+    with patch("app.main.ask_service", new=AsyncMock(return_value=fake)):
+        r = client.post("/ask", json={"question": "泵异响怎么办"})
     assert r.status_code == 200
-    assert r.json()["answer"]
+    assert r.json()["answer"] == "ok"
 
 
 def test_trace_id_unique_per_request() -> None:
