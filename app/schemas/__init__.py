@@ -1,3 +1,3 @@
-from .models import AskRequest, AskResponse
+from .models import AskRequest, AskResponse, RiskLevel, StepItem
 
-__all__ = ["AskRequest", "AskResponse"]
+__all__ = ["AskRequest", "AskResponse", "RiskLevel", "StepItem"]
