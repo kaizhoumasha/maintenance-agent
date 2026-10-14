@@ -1,6 +1,7 @@
 import asyncio
 
 import httpx2
+import litellm
 import pytest
 
 from app.core import AppError, ErrorCode
@@ -44,9 +45,17 @@ def test_ask_service_upstream() -> None:
     [
         (httpx2.ReadTimeout("t"), ErrorCode.MODEL_TIMEOUT),
         (httpx2.ConnectError("c"), ErrorCode.UPSTREAM_ERROR),
+        (
+            litellm.APIConnectionError(message="conn refused", llm_provider="ollama", model="x"),
+            ErrorCode.UPSTREAM_ERROR,
+        ),
+        (
+            litellm.RateLimitError(message="429", llm_provider="ollama", model="x"),
+            ErrorCode.UPSTREAM_ERROR,
+        ),
     ],
 )
-def test_ask_service_maps_httpx_errors(exc: Exception, code: ErrorCode) -> None:
+def test_ask_service_maps_provider_errors(exc: Exception, code: ErrorCode) -> None:
     async def boom(question: str) -> str:
         raise exc
 
